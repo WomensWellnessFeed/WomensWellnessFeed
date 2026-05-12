@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  View,
   Text,
   ScrollView,
   TouchableOpacity,
@@ -79,6 +78,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
 
 const styles = StyleSheet.create({
   container: {
+    minHeight: 50,
     maxHeight: 50,
   },
   contentContainer: {

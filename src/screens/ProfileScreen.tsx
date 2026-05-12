@@ -26,7 +26,9 @@ export const ProfileScreen: React.FC = () => {
         <MenuItem
           icon="bookmark"
           title="Saved Articles"
-          onPress={() => {}}
+          onPress={() => {
+            console.log("print saved articles")
+          }}
         />
         <MenuItem
           icon="favorite"
