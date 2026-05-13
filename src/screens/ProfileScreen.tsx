@@ -4,11 +4,10 @@ import {
   Text,
   StyleSheet,
   Image,
-  TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import { colors } from '../theme/colors';
+import { MenuItem } from '../components/MenuItem/MenuItem';
 
 export const ProfileScreen: React.FC = () => {
   return (
@@ -26,7 +25,9 @@ export const ProfileScreen: React.FC = () => {
         <MenuItem
           icon="bookmark"
           title="Saved Articles"
-          onPress={() => {}}
+          onPress={() => {
+            console.log("print saved articles")
+          }}
         />
         <MenuItem
           icon="favorite"
@@ -59,25 +60,6 @@ export const ProfileScreen: React.FC = () => {
   );
 };
 
-interface MenuItemProps {
-  icon: string;
-  title: string;
-  onPress: () => void;
-  isLast?: boolean;
-}
-
-const MenuItem: React.FC<MenuItemProps> = ({ icon, title, onPress, isLast }) => (
-  <TouchableOpacity
-    style={[styles.menuItem, isLast && styles.menuItemLast]}
-    onPress={onPress}
-  >
-    <View style={styles.menuItemLeft}>
-      <Icon name={icon} size={24} color={colors.primary} />
-      <Text style={styles.menuItemText}>{title}</Text>
-    </View>
-    <Icon name="chevron-right" size={24} color={colors.textSecondary} />
-  </TouchableOpacity>
-);
 
 const styles = StyleSheet.create({
   container: {
@@ -109,24 +91,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     marginTop: 16,
   },
-  menuItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  menuItemLast: {
-    borderBottomWidth: 0,
-  },
-  menuItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  menuItemText: {
-    fontSize: 16,
-    color: colors.text,
-    marginLeft: 16,
-  },
+
 });

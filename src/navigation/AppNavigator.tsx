@@ -2,10 +2,12 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { FeedScreen } from '../screens/FeedScreen';
+import { HomeScreen } from '../screens/HomeScreen';
 import { SearchScreen } from '../screens/SearchScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
 import { colors } from '../theme/colors';
+import { ChatScreen } from '../screens/ChatScreen';
+import { DiscoveryScreen } from '../screens/DiscoveryScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -26,8 +28,8 @@ export const AppNavigator: React.FC = () => {
         }}
       >
         <Tab.Screen
-          name="Feed"
-          component={FeedScreen}
+          name="Home"
+          component={HomeScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
               <Icon name="home" size={size} color={color} />
@@ -35,11 +37,29 @@ export const AppNavigator: React.FC = () => {
           }}
         />
         <Tab.Screen
-          name="Search"
-          component={SearchScreen}
+          name="Chat"
+          component={ChatScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
               <Icon name="search" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Discovery"
+          component={DiscoveryScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="person" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Care"
+          component={SearchScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="person" size={size} color={color} />
             ),
           }}
         />

@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  View,
   Text,
   ScrollView,
   TouchableOpacity,
@@ -12,8 +11,8 @@ import { colors } from '../theme/colors';
 
 interface CategoryFilterProps {
   categories: Category[];
-  selectedCategory: string | null;
-  onSelectCategory: (categoryId: string | null) => void;
+  selectedCategory: number | null;
+  onSelectCategory: (categoryId: number | null) => void;
 }
 
 export const CategoryFilter: React.FC<CategoryFilterProps> = ({
@@ -79,6 +78,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
 
 const styles = StyleSheet.create({
   container: {
+    minHeight: 50,
     maxHeight: 50,
   },
   contentContainer: {

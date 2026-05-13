@@ -1,5 +1,5 @@
 export interface Article {
-  id: string;
+  id: number;
   title: string;
   excerpt: string;
   author: string;
@@ -12,7 +12,7 @@ export interface Article {
 }
 
 export interface Category {
-  id: string;
+  id: number;
   name: string;
   icon: string;
 }
