@@ -4,15 +4,12 @@ import { AppNavigator } from './src/navigation/AppNavigator';
 import { colors } from './src/theme/colors';
 
 const App: React.FC = () => {
-  return (
-    <>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor={colors.primary}
-      />
-      <AppNavigator />
-    </>
-  );
+    return (
+        <>
+            <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+            <AppNavigator />
+        </>
+    );
 };
 
 export default App;
