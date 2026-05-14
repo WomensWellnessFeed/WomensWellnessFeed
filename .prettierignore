@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+.expo/
+.expo-shared/
+
+# Build outputs
+dist/
+build/
+*.bundle
+*.jsbundle
+
+# Native
+ios/
+android/
+
+# Generated files
+# coverage/ todo
+
+# Config files that should maintain their formatting
+package-lock.json
+yarn.lock
