@@ -11,6 +11,10 @@ import { DiscoveryScreen } from '../screens/DiscoveryScreen';
 
 const Tab = createBottomTabNavigator();
 
+const renderTabBarIcon = (name: string) => ({ color, size }: { color: string; size: number }) => (
+    <Icon name={name} size={size} color={color} />
+);
+
 export const AppNavigator: React.FC = () => {
     return (
         <NavigationContainer>
@@ -31,45 +35,35 @@ export const AppNavigator: React.FC = () => {
                     name="Home"
                     component={HomeScreen}
                     options={{
-                        tabBarIcon: ({ color, size }) => (
-                            <Icon name="home" size={size} color={color} />
-                        ),
+                        tabBarIcon: renderTabBarIcon('home'),
                     }}
                 />
                 <Tab.Screen
                     name="Chat"
                     component={ChatScreen}
                     options={{
-                        tabBarIcon: ({ color, size }) => (
-                            <Icon name="search" size={size} color={color} />
-                        ),
+                        tabBarIcon: renderTabBarIcon('search'),
                     }}
                 />
                 <Tab.Screen
                     name="Discovery"
                     component={DiscoveryScreen}
                     options={{
-                        tabBarIcon: ({ color, size }) => (
-                            <Icon name="person" size={size} color={color} />
-                        ),
+                        tabBarIcon: renderTabBarIcon('person'),
                     }}
                 />
                 <Tab.Screen
                     name="Care"
                     component={SearchScreen}
                     options={{
-                        tabBarIcon: ({ color, size }) => (
-                            <Icon name="person" size={size} color={color} />
-                        ),
+                        tabBarIcon: renderTabBarIcon('person'),
                     }}
                 />
                 <Tab.Screen
                     name="Profile"
                     component={ProfileScreen}
                     options={{
-                        tabBarIcon: ({ color, size }) => (
-                            <Icon name="person" size={size} color={color} />
-                        ),
+                        tabBarIcon: renderTabBarIcon('person'),
                     }}
                 />
             </Tab.Navigator>

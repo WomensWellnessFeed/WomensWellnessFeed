@@ -23,7 +23,6 @@ export const HomeScreen: React.FC = () => {
                 ? MOCK_ARTICLES.filter(a => a.category === MOCK_CATEGORIES[selectedCategory]?.name)
                 : MOCK_ARTICLES;
 
-            console.log(filtered, selectedCategory);
             setArticles(filtered);
             setIsLoading(false);
         }, 500);
