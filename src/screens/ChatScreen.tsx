@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
     ActivityIndicator,
     KeyboardAvoidingView,
@@ -13,7 +13,7 @@ import {
 import { useTheme } from '../theme/ThemeContext';
 import { Theme } from '../theme/themes';
 
-const API_URL = 'http://localhost:3000/api/chat';
+const API_BACKEND_URL = 'http://localhost:3000/api/chat';
 
 type ChatMessage = {
     role: 'user' | 'assistant';
@@ -41,34 +41,68 @@ export const ChatScreen: React.FC = () => {
         setInput('');
         setLoading(true);
 
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ messages: updatedMessages }),
-            });
+            try {
+                const systemPrompt = `You are Dr. Diane, a compassionate and evidence-based women's wellness advisor. Answer user questions clearly, cite general best practices when appropriate, and suggest seeing a healthcare professional when needed.`;
+                // Prefer using an in-app OpenAI API key when available (set via build/runtime env or global),
+                // otherwise fall back to the local backend proxy at `API_BACKEND_URL`.
+                const openaiKey = (global as any).__OPENAI_API_KEY__ || (typeof process !== 'undefined' && (process.env as any)?.OPENAI_API_KEY) || '';
 
-            const data = await response.json();
-            const assistantMessage = data.message?.content || "Sorry, I couldn't get a response.";
+                const requestMessages = [
+                    { role: 'system', content: systemPrompt },
+                    ...updatedMessages.map(m => ({ role: m.role, content: m.content })),
+                ];
 
-            setMessages([
-                ...updatedMessages,
-                { role: 'assistant', content: assistantMessage },
-            ]);
-        } catch (error) {
-            console.error(error);
-            setMessages([
-                ...updatedMessages,
-                {
-                    role: 'assistant',
-                    content: 'Something went wrong while sending your message. Please try again.',
-                },
-            ]);
-        } finally {
-            setLoading(false);
-        }
+                if (openaiKey) {
+                    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${openaiKey}`,
+                        },
+                        body: JSON.stringify({
+                            model: 'gpt-4o-mini',
+                            messages: requestMessages,
+                            max_tokens: 1000,
+                            temperature: 0.7,
+                        }),
+                    });
+
+                    const json = await resp.json();
+                    const assistantMessage = json?.choices?.[0]?.message?.content || "Sorry, I couldn't get a response.";
+
+                    setMessages([
+                        ...updatedMessages,
+                        { role: 'assistant', content: assistantMessage },
+                    ]);
+                } else {
+                    const response = await fetch(API_BACKEND_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ messages: requestMessages }),
+                    });
+
+                    const data = await response.json();
+                    const assistantMessage = data.message?.content || "Sorry, I couldn't get a response.";
+
+                    setMessages([
+                        ...updatedMessages,
+                        { role: 'assistant', content: assistantMessage },
+                    ]);
+                }
+            } catch (error) {
+                console.error(error);
+                setMessages([
+                    ...updatedMessages,
+                    {
+                        role: 'assistant',
+                        content: 'Something went wrong while sending your message. Please try again.',
+                    },
+                ]);
+            } finally {
+                setLoading(false);
+            }
     };
 
     return (
@@ -78,6 +112,13 @@ export const ChatScreen: React.FC = () => {
         >
             <View style={styles.header}>
                 <Text style={styles.name}>Dr. Diane</Text>
+                <TouchableOpacity
+                    onPress={() => setMessages([])}
+                    style={styles.clearButton}
+                    accessibilityLabel="Clear conversation"
+                >
+                    <Text style={styles.clearText}>Clear</Text>
+                </TouchableOpacity>
             </View>
 
             <ScrollView
@@ -187,6 +228,19 @@ const createStyles = (theme: Theme) =>
         bubbleText: {
             fontSize: 16,
             color: theme.text,
+        },
+        clearButton: {
+            position: 'absolute',
+            right: 16,
+            top: 28,
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            borderRadius: 6,
+            backgroundColor: theme.background,
+        },
+        clearText: {
+            color: theme.textSecondary,
+            fontWeight: '700',
         },
         inputRow: {
             flexDirection: 'row',
