@@ -1,14 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
-import { colors } from '../theme/colors';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MenuItem } from '../components/MenuItem/MenuItem';
+import { useTheme } from '../theme/ThemeContext';
+import { Theme } from '../theme/themes';
 import { SettingsModal } from './SettingsModal/SettingsModal';
 
-const Stack = createNativeStackNavigator();
-
 export const ProfileScreen: React.FC = () => {
+    const { theme, toggleTheme, isDarkMode } = useTheme();
+    const styles = createStyles(theme);
+
     const [showSettingsModal, setShowSettingsModal] = React.useState(false);
+
     return (
         <>
             <View style={styles.header}>
@@ -23,14 +25,14 @@ export const ProfileScreen: React.FC = () => {
             </View>
 
             <View style={styles.section}>
-                <MenuItem
-                    icon="bookmark"
-                    title="Saved Articles"
-                    onPress={() => {}}
-                />
+                <MenuItem icon="bookmark" title="Saved Articles" onPress={() => {}} />
                 <MenuItem icon="favorite" title="Liked Posts" onPress={() => {}} />
                 <MenuItem icon="notifications" title="Notifications" onPress={() => {}} />
-                <MenuItem icon="settings" title="Settings" onPress={() => setShowSettingsModal(true)} />
+                <MenuItem
+                    icon="settings"
+                    title="Settings"
+                    onPress={() => setShowSettingsModal(true)}
+                />
                 <MenuItem icon="help" title="Help & Support" onPress={() => {}} />
                 <MenuItem icon="logout" title="Logout" onPress={() => {}} isLast />
             </View>
@@ -43,34 +45,35 @@ export const ProfileScreen: React.FC = () => {
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    header: {
-        backgroundColor: colors.surface,
-        alignItems: 'center',
-        padding: 32,
-    },
-    avatar: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        marginBottom: 16,
-    },
-    name: {
-        fontSize: 24,
-        fontWeight: '700',
-        color: colors.text,
-        marginBottom: 4,
-    },
-    email: {
-        fontSize: 14,
-        color: colors.textSecondary,
-    },
-    section: {
-        backgroundColor: colors.surface,
-        marginTop: 16,
-    },
-});
+const createStyles = (theme: Theme) =>
+    StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: theme.background,
+        },
+        header: {
+            backgroundColor: theme.surface,
+            alignItems: 'center',
+            padding: 32,
+        },
+        avatar: {
+            width: 100,
+            height: 100,
+            borderRadius: 50,
+            marginBottom: 16,
+        },
+        name: {
+            fontSize: 24,
+            fontWeight: '700',
+            color: theme.text,
+            marginBottom: 4,
+        },
+        email: {
+            fontSize: 14,
+            color: theme.textSecondary,
+        },
+        section: {
+            backgroundColor: theme.surface,
+            marginTop: 16,
+        },
+    });

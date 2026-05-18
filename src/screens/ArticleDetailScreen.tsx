@@ -1,8 +1,12 @@
 import React from 'react';
 import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
-import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
+import { Theme } from '../theme/themes';
 
 export const ArticleDetailScreen: React.FC = () => {
+    const { theme } = useTheme();
+    const styles = createStyles(theme);
+
     return (
         <ScrollView style={styles.container}>
             <Image
@@ -25,38 +29,39 @@ export const ArticleDetailScreen: React.FC = () => {
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    heroImage: {
-        width: '100%',
-        height: 250,
-    },
-    content: {
-        padding: 16,
-    },
-    category: {
-        fontSize: 12,
-        color: colors.primary,
-        fontWeight: '600',
-        marginBottom: 8,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: '700',
-        color: colors.text,
-        marginBottom: 8,
-    },
-    author: {
-        fontSize: 14,
-        color: colors.textSecondary,
-        marginBottom: 24,
-    },
-    body: {
-        fontSize: 16,
-        lineHeight: 24,
-        color: colors.text,
-    },
-});
+const createStyles = (theme: Theme) =>
+    StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: theme.background,
+        },
+        heroImage: {
+            width: '100%',
+            height: 250,
+        },
+        content: {
+            padding: 16,
+        },
+        category: {
+            fontSize: 12,
+            color: theme.primary,
+            fontWeight: '600',
+            marginBottom: 8,
+        },
+        title: {
+            fontSize: 28,
+            fontWeight: '700',
+            color: theme.text,
+            marginBottom: 8,
+        },
+        author: {
+            fontSize: 14,
+            color: theme.textSecondary,
+            marginBottom: 24,
+        },
+        body: {
+            fontSize: 16,
+            lineHeight: 24,
+            color: theme.text,
+        },
+    });
