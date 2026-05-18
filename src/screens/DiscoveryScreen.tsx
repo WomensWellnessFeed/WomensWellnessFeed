@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, StyleSheet, View } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
+import { Theme } from '../theme/themes';
 
 export const DiscoveryScreen: React.FC = () => {
     const { theme } = useTheme();
@@ -13,7 +14,7 @@ export const DiscoveryScreen: React.FC = () => {
     );
 };
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: Theme) =>
     StyleSheet.create({
         centerContainer: {
             flex: 1,

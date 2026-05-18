@@ -3,6 +3,7 @@ import { View, TextInput, StyleSheet, FlatList, Text } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { FeedCard } from '../components/FeedCard';
 import { Article } from '../types';
+import { Theme } from '../theme/themes';
 
 export const SearchScreen: React.FC = () => {
     const { theme } = useTheme();
@@ -42,7 +43,7 @@ export const SearchScreen: React.FC = () => {
     );
 };
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: Theme) =>
     StyleSheet.create({
         container: {
             flex: 1,

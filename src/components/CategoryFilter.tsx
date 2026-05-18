@@ -3,6 +3,7 @@ import { Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Category } from '../types';
 import { useTheme } from '../theme/ThemeContext';
+import { Theme } from '../theme/themes';
 
 interface CategoryFilterProps {
     categories: Category[];
@@ -62,7 +63,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
     );
 };
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: Theme) =>
     StyleSheet.create({
         container: {
             minHeight: 50,

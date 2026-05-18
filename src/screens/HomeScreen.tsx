@@ -5,6 +5,7 @@ import { CategoryFilter } from '../components/CategoryFilter';
 import { Article } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { MOCK_ARTICLES, MOCK_CATEGORIES } from '../constants/mocks';
+import { Theme } from '../theme/themes';
 
 export const HomeScreen: React.FC = () => {
     const { theme } = useTheme();
@@ -96,7 +97,7 @@ export const HomeScreen: React.FC = () => {
     );
 };
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: Theme) =>
     StyleSheet.create({
         container: {
             flex: 1,

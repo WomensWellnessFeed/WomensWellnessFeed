@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
+import { Theme } from '../theme/themes';
 
 export const ArticleDetailScreen: React.FC = () => {
     const { theme } = useTheme();
@@ -28,7 +29,7 @@ export const ArticleDetailScreen: React.FC = () => {
     );
 };
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: Theme) =>
     StyleSheet.create({
         container: {
             flex: 1,

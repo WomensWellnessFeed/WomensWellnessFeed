@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 import { MenuItem } from '../components/MenuItem/MenuItem';
 import { useTheme } from '../theme/ThemeContext';
+import { Theme } from '../theme/themes';
 
 export const ProfileScreen: React.FC = () => {
     const { theme, toggleTheme, isDarkMode } = useTheme();
@@ -43,7 +44,7 @@ export const ProfileScreen: React.FC = () => {
     );
 };
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: Theme) =>
     StyleSheet.create({
         container: {
             flex: 1,

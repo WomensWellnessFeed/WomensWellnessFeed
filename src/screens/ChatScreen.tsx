@@ -11,6 +11,7 @@ import {
     View,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
+import { Theme } from '../theme/themes';
 
 const API_URL = 'http://localhost:3000/api/chat';
 
@@ -130,7 +131,7 @@ export const ChatScreen: React.FC = () => {
     );
 };
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: Theme) =>
     StyleSheet.create({
         container: {
             flex: 1,

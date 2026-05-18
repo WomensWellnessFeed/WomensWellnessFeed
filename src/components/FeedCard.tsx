@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'rea
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Article } from '../types';
 import { useTheme } from '../theme/ThemeContext';
+import { Theme } from '../theme/themes';
 
 interface FeedCardProps {
     article: Article;
@@ -54,7 +55,7 @@ export const FeedCard: React.FC<FeedCardProps> = ({ article, onPress, onLike, on
     );
 };
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: Theme) =>
     StyleSheet.create({
         card: {
             backgroundColor: theme.surface,

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '../../theme/ThemeContext';
+import { Theme } from '../../theme/themes';
 
 interface MenuItemProps {
     icon: string;
@@ -25,7 +26,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({ icon, title, onPress, isLast
     );
 };
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: Theme) =>
     StyleSheet.create({
         menuItem: {
             flexDirection: 'row',
