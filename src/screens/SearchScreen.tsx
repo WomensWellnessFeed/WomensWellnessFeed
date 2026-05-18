@@ -26,15 +26,8 @@ export const SearchScreen: React.FC = () => {
             )}
             <FlatList
                 data={results}
-                keyExtractor={item => item.id}
-                renderItem={({ item }) => (
-                    <FeedCard
-                        article={item}
-                        onPress={() => {}}
-                        onLike={() => {}}
-                        onBookmark={() => {}}
-                    />
-                )}
+                keyExtractor={item => item.id.toString()}
+                renderItem={({ item }) => <FeedCard article={item} onPress={() => {}} />}
             />
         </View>
     );

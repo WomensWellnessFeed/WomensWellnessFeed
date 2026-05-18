@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Article } from '../types';
 import { colors } from '../theme/colors';
@@ -11,31 +11,42 @@ interface FeedCardProps {
     onBookmark: () => void;
 }
 
-const { width } = Dimensions.get('window');
-
 export const FeedCard: React.FC<FeedCardProps> = ({ article, onPress, onLike, onBookmark }) => {
+    const publishedDate = article.publishedAt
+        ? new Date(article.publishedAt).toLocaleDateString()
+        : '';
+
     return (
         <TouchableOpacity style={styles.card} onPress={onPress}>
-            {article.imageUrl && <Image source={{ uri: article.imageUrl }} style={styles.image} />}
+            {article.imageUrl ? (
+                <Image source={{ uri: article.imageUrl }} style={styles.image} />
+            ) : (
+                <View style={styles.imagePlaceholder} />
+            )}
             <View style={styles.content}>
-                <View style={styles.categoryBadge}>
-                    <Text style={styles.categoryText}>{article.category}</Text>
-                </View>
+                {article.category ? (
+                    <View style={styles.categoryBadge}>
+                        <Text style={styles.categoryText}>{article.category}</Text>
+                    </View>
+                ) : null}
+                <Text style={styles.dateText}>{publishedDate}</Text>
                 <Text style={styles.title} numberOfLines={2}>
                     {article.title}
                 </Text>
-                <Text style={styles.excerpt} numberOfLines={3}>
+                <Text style={styles.excerpt} numberOfLines={4}>
                     {article.excerpt}
                 </Text>
                 <View style={styles.footer}>
                     <View style={styles.authorInfo}>
                         <Text style={styles.author}>{article.author}</Text>
-                        <Text style={styles.readTime}> • {article.readTime} min read</Text>
+                        {article.readTime ? (
+                            <Text style={styles.readTime}> • {article.readTime} min read</Text>
+                        ) : null}
                     </View>
                     <View style={styles.actions}>
                         <TouchableOpacity style={styles.actionButton} onPress={onLike}>
                             <Icon name="favorite-border" size={20} color={colors.primary} />
-                            <Text style={styles.actionText}>{article.likes}</Text>
+                            <Text style={styles.actionText}>{article.likes ?? 0}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.actionButton} onPress={onBookmark}>
                             <Icon
@@ -69,6 +80,13 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 12,
         borderTopRightRadius: 12,
     },
+    imagePlaceholder: {
+        width: '100%',
+        height: 200,
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 12,
+        backgroundColor: '#F2F2F2',
+    },
     content: {
         padding: 16,
     },
@@ -84,6 +102,11 @@ const styles = StyleSheet.create({
         color: colors.primary,
         fontSize: 12,
         fontWeight: '600',
+    },
+    dateText: {
+        fontSize: 12,
+        color: colors.textSecondary,
+        marginBottom: 8,
     },
     title: {
         fontSize: 18,
@@ -105,6 +128,7 @@ const styles = StyleSheet.create({
     authorInfo: {
         flexDirection: 'row',
         alignItems: 'center',
+        flexShrink: 1,
     },
     author: {
         fontSize: 12,
