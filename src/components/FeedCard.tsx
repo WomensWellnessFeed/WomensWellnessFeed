@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Article } from '../types';
-import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
+import { Theme } from '../theme/themes';
 
 interface FeedCardProps {
     article: Article;
@@ -14,6 +15,9 @@ interface FeedCardProps {
 const { width } = Dimensions.get('window');
 
 export const FeedCard: React.FC<FeedCardProps> = ({ article, onPress, onLike, onBookmark }) => {
+    const { theme } = useTheme();
+    const styles = createStyles(theme);
+
     return (
         <TouchableOpacity style={styles.card} onPress={onPress}>
             {article.imageUrl && <Image source={{ uri: article.imageUrl }} style={styles.image} />}
@@ -34,14 +38,14 @@ export const FeedCard: React.FC<FeedCardProps> = ({ article, onPress, onLike, on
                     </View>
                     <View style={styles.actions}>
                         <TouchableOpacity style={styles.actionButton} onPress={onLike}>
-                            <Icon name="favorite-border" size={20} color={colors.primary} />
+                            <Icon name="favorite-border" size={20} color={theme.primary} />
                             <Text style={styles.actionText}>{article.likes}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.actionButton} onPress={onBookmark}>
                             <Icon
                                 name={article.isBookmarked ? 'bookmark' : 'bookmark-border'}
                                 size={20}
-                                color={colors.primary}
+                                color={theme.primary}
                             />
                         </TouchableOpacity>
                     </View>
@@ -51,82 +55,83 @@ export const FeedCard: React.FC<FeedCardProps> = ({ article, onPress, onLike, on
     );
 };
 
-const styles = StyleSheet.create({
-    card: {
-        backgroundColor: colors.surface,
-        borderRadius: 12,
-        marginHorizontal: 16,
-        marginVertical: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    image: {
-        width: '100%',
-        height: 200,
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12,
-    },
-    content: {
-        padding: 16,
-    },
-    categoryBadge: {
-        alignSelf: 'flex-start',
-        backgroundColor: colors.primary + '20',
-        paddingHorizontal: 12,
-        paddingVertical: 4,
-        borderRadius: 12,
-        marginBottom: 8,
-    },
-    categoryText: {
-        color: colors.primary,
-        fontSize: 12,
-        fontWeight: '600',
-    },
-    title: {
-        fontSize: 18,
-        fontWeight: '700',
-        color: colors.text,
-        marginBottom: 8,
-    },
-    excerpt: {
-        fontSize: 14,
-        color: colors.textSecondary,
-        lineHeight: 20,
-        marginBottom: 12,
-    },
-    footer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    authorInfo: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    author: {
-        fontSize: 12,
-        color: colors.text,
-        fontWeight: '600',
-    },
-    readTime: {
-        fontSize: 12,
-        color: colors.textSecondary,
-    },
-    actions: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    actionButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginLeft: 16,
-    },
-    actionText: {
-        marginLeft: 4,
-        fontSize: 12,
-        color: colors.textSecondary,
-    },
-});
+const createStyles = (theme: Theme) =>
+    StyleSheet.create({
+        card: {
+            backgroundColor: theme.surface,
+            borderRadius: 12,
+            marginHorizontal: 16,
+            marginVertical: 8,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 3,
+        },
+        image: {
+            width: '100%',
+            height: 200,
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12,
+        },
+        content: {
+            padding: 16,
+        },
+        categoryBadge: {
+            alignSelf: 'flex-start',
+            backgroundColor: theme.primary + '20',
+            paddingHorizontal: 12,
+            paddingVertical: 4,
+            borderRadius: 12,
+            marginBottom: 8,
+        },
+        categoryText: {
+            color: theme.primary,
+            fontSize: 12,
+            fontWeight: '600',
+        },
+        title: {
+            fontSize: 18,
+            fontWeight: '700',
+            color: theme.text,
+            marginBottom: 8,
+        },
+        excerpt: {
+            fontSize: 14,
+            color: theme.textSecondary,
+            lineHeight: 20,
+            marginBottom: 12,
+        },
+        footer: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+        },
+        authorInfo: {
+            flexDirection: 'row',
+            alignItems: 'center',
+        },
+        author: {
+            fontSize: 12,
+            color: theme.text,
+            fontWeight: '600',
+        },
+        readTime: {
+            fontSize: 12,
+            color: theme.textSecondary,
+        },
+        actions: {
+            flexDirection: 'row',
+            alignItems: 'center',
+        },
+        actionButton: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginLeft: 16,
+        },
+        actionText: {
+            marginLeft: 4,
+            fontSize: 12,
+            color: theme.textSecondary,
+        },
+    });
