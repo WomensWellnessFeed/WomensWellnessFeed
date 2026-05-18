@@ -69,14 +69,14 @@ const createStyles = (theme: Theme) =>
             minHeight: 50,
             maxHeight: 50,
             alignSelf: Platform.select({
-            web: 'center',
-            default: 'auto',
-        }),
-        width: Platform.select({
-            web: '80%',
-            default: '100%',
-        }),
-        marginBottom: 10,
+                web: 'center',
+                default: 'auto',
+             }),
+            width: Platform.select({
+                web: '80%',
+                default: '100%',
+            }),
+            marginBottom: 10,
         },
         contentContainer: {
             paddingHorizontal: 16,
