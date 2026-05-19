@@ -22,12 +22,15 @@ export interface WordPressPost {
 }
 
 const stripHtml = (html: string): string => {
-    return html.replace(/<[^>]+>/g, '').trim();
+    return html
+        .replace(/<script[\s\S]*?<\/script>/gi, '')
+        .replace(/<style[\s\S]*?<\/style>/gi, '')
+        .replace(/<[^>]+>/g, '')
+        .trim();
 };
 
 const decodeHtmlEntities = (text: string): string => {
     return text
-        .replace(/&amp;/g, '&')
         .replace(/&quot;/g, '"')
         .replace(/&#39;|&apos;/g, "'")
         .replace(/&#8217;|&rsquo;/g, '’')
@@ -38,6 +41,7 @@ const decodeHtmlEntities = (text: string): string => {
         .replace(/&nbsp;/g, ' ')
         .replace(/&lt;/g, '<')
         .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
         .trim();
 };
 
