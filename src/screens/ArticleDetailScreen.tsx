@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
+import { Theme } from '../theme/themes';
 import { Article } from '../types';
 
 type HomeStackParamList = {
@@ -11,6 +12,8 @@ type HomeStackParamList = {
 type ArticleDetailScreenProps = NativeStackScreenProps<HomeStackParamList, 'ArticleDetail'>;
 
 export const ArticleDetailScreen: React.FC<ArticleDetailScreenProps> = ({ route }) => {
+    const { theme } = useTheme();
+    const styles = createStyles(theme);
     const { article } = route.params;
     const publishedDate = article.publishedAt ? new Date(article.publishedAt).toLocaleDateString() : '';
 
@@ -23,45 +26,51 @@ export const ArticleDetailScreen: React.FC<ArticleDetailScreenProps> = ({ route 
                 <Text style={styles.author}>
                     By {article.author ?? 'Author'}{article.readTime ? ` • ${article.readTime} min read` : ''}
                 </Text>
+                {publishedDate ? <Text style={styles.date}>{publishedDate}</Text> : null}
                 <Text style={styles.body}>{article.content ?? article.excerpt}</Text>
             </View>
         </ScrollView>
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    heroImage: {
-        width: '100%',
-        height: 250,
-    },
-    content: {
-        padding: 16,
-    },
-    category: {
-        fontSize: 12,
-        color: colors.primary,
-        fontWeight: '600',
-        marginBottom: 8,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: '700',
-        color: colors.text,
-        marginBottom: 8,
-    },
-    author: {
-        fontSize: 14,
-        color: colors.textSecondary,
-        marginBottom: 18,
-    },
-    body: {
-        fontSize: 16,
-        lineHeight: 20,
-        color: colors.text,
-        marginBottom: 24,
-    },
-});
+const createStyles = (theme: Theme) =>
+    StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: theme.background,
+        },
+        heroImage: {
+            width: '100%',
+            height: 250,
+        },
+        content: {
+            padding: 16,
+        },
+        category: {
+            fontSize: 12,
+            color: theme.primary,
+            fontWeight: '600',
+            marginBottom: 8,
+        },
+        title: {
+            fontSize: 28,
+            fontWeight: '700',
+            color: theme.text,
+            marginBottom: 8,
+        },
+        author: {
+            fontSize: 14,
+            color: theme.textSecondary,
+            marginBottom: 24,
+        },
+        date: {
+            fontSize: 12,
+            color: theme.textSecondary,
+            marginBottom: 12,
+        },
+        body: {
+            fontSize: 16,
+            lineHeight: 24,
+            color: theme.text,
+        },
+    });

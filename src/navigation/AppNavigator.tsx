@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -7,91 +7,109 @@ import { HomeScreen } from '../screens/HomeScreen';
 import { ArticleDetailScreen } from '../screens/ArticleDetailScreen';
 import { SearchScreen } from '../screens/SearchScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
-import { colors } from '../theme/colors';
 import { ChatScreen } from '../screens/ChatScreen';
 import { DiscoveryScreen } from '../screens/DiscoveryScreen';
+import { useTheme } from '../theme/ThemeContext';
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
 
-const HomeStackScreen: React.FC = () => (
-    <HomeStack.Navigator
-        screenOptions={{
-            headerStyle: {
-                backgroundColor: colors.primary,
-            },
-            headerTintColor: colors.surface,
-            headerTitleStyle: {
-                fontWeight: '700',
-            },
-        }}
-    >
-        <HomeStack.Screen
-            name="HomeMain"
-            component={HomeScreen}
-            options={{ headerShown: false }}
-        />
-        <HomeStack.Screen
-            name="ArticleDetail"
-            component={ArticleDetailScreen}
-            options={{ title: 'Article' }}
-        />
-    </HomeStack.Navigator>
+const HomeStackScreen: React.FC = () => {
+    const { theme } = useTheme();
+
+    return (
+        <HomeStack.Navigator
+            screenOptions={{
+                headerStyle: {
+                    backgroundColor: theme.primary,
+                },
+                headerTintColor: theme.surface,
+                headerTitleStyle: {
+                    fontWeight: '700',
+                },
+            }}
+        >
+            <HomeStack.Screen
+                name="HomeMain"
+                component={HomeScreen}
+                options={{ headerShown: false }}
+            />
+            <HomeStack.Screen
+                name="ArticleDetail"
+                component={ArticleDetailScreen}
+                options={{ title: 'Article' }}
+            />
+        </HomeStack.Navigator>
+    );
+};
+
+const renderTabBarIcon = (name: string) => ({ color, size }: { color: string; size: number }) => (
+    <Icon name={name} size={size} color={color} />
 );
 
 export const AppNavigator: React.FC = () => {
+    const { theme } = useTheme();
+    const navigationTheme = {
+        ...DefaultTheme,
+        colors: {
+            ...DefaultTheme.colors,
+            primary: theme.primary,
+            background: theme.background,
+            card: theme.surface,
+            text: theme.text,
+            border: theme.border,
+            notification: theme.accent,
+        },
+    };
+
     return (
-        <NavigationContainer>
+        <NavigationContainer theme={navigationTheme}>
             <Tab.Navigator
                 screenOptions={{
-                    tabBarActiveTintColor: colors.primary,
-                    tabBarInactiveTintColor: colors.textSecondary,
-                    headerShown: false,
+                    tabBarActiveTintColor: theme.primary,
+                    tabBarInactiveTintColor: theme.textSecondary,
+                    headerStyle: {
+                        backgroundColor: theme.primary,
+                    },
+                    headerTintColor: theme.surface,
+                    headerTitleStyle: {
+                        fontWeight: '700',
+                    },
                 }}
             >
                 <Tab.Screen
                     name="Home"
                     component={HomeStackScreen}
                     options={{
-                        tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-                            <Icon name="home" size={size} color={color} />
-                        ),
+                        tabBarIcon: renderTabBarIcon('home'),
                     }}
                 />
                 <Tab.Screen
                     name="Chat"
                     component={ChatScreen}
                     options={{
-                        tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-                            <Icon name="search" size={size} color={color} />
-                        ),
+                        tabBarIcon: renderTabBarIcon('search'),
                     }}
                 />
                 <Tab.Screen
                     name="Discovery"
                     component={DiscoveryScreen}
                     options={{
-                        tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-                            <Icon name="person" size={size} color={color} />
-                        ),
+                        tabBarIcon: renderTabBarIcon('person'),
                     }}
                 />
                 <Tab.Screen
                     name="Care"
                     component={SearchScreen}
                     options={{
-                        tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-                            <Icon name="person" size={size} color={color} />
-                        ),
+                        tabBarIcon: renderTabBarIcon('person'),
                     }}
                 />
                 <Tab.Screen
                     name="Profile"
                     component={ProfileScreen}
                     options={{
-                        tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-                            <Icon name="person" size={size} color={color} />
-                        ),
+                        tabBarIcon: renderTabBarIcon('person'),
                     }}
                 />
             </Tab.Navigator>

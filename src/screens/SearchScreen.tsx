@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, FlatList, Text } from 'react-native';
-import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 import { FeedCard } from '../components/FeedCard';
 import { Article } from '../types';
+import { Theme } from '../theme/themes';
 
 export const SearchScreen: React.FC = () => {
+    const { theme } = useTheme();
+    const styles = createStyles(theme);
     const [searchQuery, setSearchQuery] = useState('');
     const [results, setResults] = useState<Article[]>([]);
 
@@ -16,7 +19,7 @@ export const SearchScreen: React.FC = () => {
                     placeholder="Search articles..."
                     value={searchQuery}
                     onChangeText={setSearchQuery}
-                    placeholderTextColor={colors.textSecondary}
+                    placeholderTextColor={theme.textSecondary}
                 />
             </View>
             {results.length === 0 && searchQuery === '' && (
@@ -33,32 +36,33 @@ export const SearchScreen: React.FC = () => {
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    searchContainer: {
-        padding: 16,
-        backgroundColor: colors.surface,
-    },
-    searchInput: {
-        backgroundColor: colors.background,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 8,
-        fontSize: 16,
-        color: colors.text,
-    },
-    emptyState: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 32,
-    },
-    emptyText: {
-        fontSize: 16,
-        color: colors.textSecondary,
-        textAlign: 'center',
-    },
-});
+const createStyles = (theme: Theme) =>
+    StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: theme.background,
+        },
+        searchContainer: {
+            padding: 16,
+            backgroundColor: theme.surface,
+        },
+        searchInput: {
+            backgroundColor: theme.background,
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            borderRadius: 8,
+            fontSize: 16,
+            color: theme.text,
+        },
+        emptyState: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 32,
+        },
+        emptyText: {
+            fontSize: 16,
+            color: theme.textSecondary,
+            textAlign: 'center',
+        },
+    });

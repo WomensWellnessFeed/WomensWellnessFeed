@@ -5,7 +5,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FeedCard } from '../components/FeedCard';
 import { CategoryFilter } from '../components/CategoryFilter';
 import { Article, Category } from '../types';
-import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
+import { Theme } from '../theme/themes';
 import { fetchPosts, fetchCategories, mapWordPressCategoryToIcon } from '../api/wordpress';
 
 type HomeStackParamList = {
@@ -18,6 +19,8 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<HomeStackParamList, 'H
 const POSTS_PER_PAGE = 10;
 
 export const HomeScreen: React.FC = () => {
+    const { theme } = useTheme();
+    const styles = createStyles(theme);
     const [articles, setArticles] = useState<Article[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
@@ -141,7 +144,7 @@ export const HomeScreen: React.FC = () => {
     if (isLoading) {
         return (
             <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color={colors.primary} />
+                <ActivityIndicator size="large" color={theme.primary} />
             </View>
         );
     }
@@ -175,12 +178,12 @@ export const HomeScreen: React.FC = () => {
                     <RefreshControl
                         refreshing={isRefreshing}
                         onRefresh={handleRefresh}
-                        tintColor={colors.primary}
+                        tintColor={theme.primary}
                     />
                 }
                 ListFooterComponent={
                     isLoadingMore ? (
-                        <ActivityIndicator size="small" color={colors.primary} style={styles.footerLoader} />
+                        <ActivityIndicator size="small" color={theme.primary} style={styles.footerLoader} />
                     ) : null
                 }
                 ListEmptyComponent={
@@ -193,37 +196,38 @@ export const HomeScreen: React.FC = () => {
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    centerContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: colors.background,
-    },
-    emptyContainer: {
-        padding: 32,
-        alignItems: 'center',
-    },
-    emptyText: {
-        fontSize: 16,
-        color: colors.textSecondary,
-    },
-    errorContainer: {
-        padding: 16,
-        backgroundColor: colors.surface,
-        borderBottomWidth: 1,
-        borderBottomColor: '#E2E8F0',
-    },
-    errorText: {
-        color: colors.error || '#B00020',
-        fontSize: 14,
-        textAlign: 'center',
-    },
-    footerLoader: {
-        marginVertical: 16,
-    },
-});
+const createStyles = (theme: Theme) =>
+    StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: theme.background,
+        },
+        centerContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: theme.background,
+        },
+        emptyContainer: {
+            padding: 32,
+            alignItems: 'center',
+        },
+        emptyText: {
+            fontSize: 16,
+            color: theme.textSecondary,
+        },
+        errorContainer: {
+            padding: 16,
+            backgroundColor: theme.surface,
+            borderBottomWidth: 1,
+            borderBottomColor: '#E2E8F0',
+        },
+        errorText: {
+            color: theme.error || '#B00020',
+            fontSize: 14,
+            textAlign: 'center',
+        },
+        footerLoader: {
+            marginVertical: 16,
+        },
+    });
