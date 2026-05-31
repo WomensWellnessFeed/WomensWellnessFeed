@@ -59,13 +59,8 @@ const decodeHtmlEntities = (text: string): string => {
 const stripHtml = (html: string): string => {
     if (!html) return '';
 
-    // Remove script/style blocks first to avoid leftover tags or JS.
-    const withoutScripts = html
-        .replace(/<script[\s\S]*?<\/script>/gi, '')
-        .replace(/<style[\s\S]*?<\/style>/gi, '');
-
     // Use sanitize-html to remove all tags and attributes.
-    const sanitized = sanitizeHtml(withoutScripts, { allowedTags: [], allowedAttributes: {} });
+    const sanitized = sanitizeHtml(html, { allowedTags: [], allowedAttributes: {} });
 
     // Decode any HTML entities and collapse whitespace.
     return decodeHtmlEntities(sanitized).replace(/\s+/g, ' ').trim();
