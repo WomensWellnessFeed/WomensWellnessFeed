@@ -1,3 +1,4 @@
+import sanitizeHtml from 'sanitize-html';
 const BASE_URL = 'https://public-api.wordpress.com/wp/v2/sites/womenswellnessfeedstaging.wordpress.com';
 
 export interface WordPressCategory {
@@ -21,17 +22,22 @@ export interface WordPressPost {
     isBookmarked?: boolean;
 }
 
-const stripHtml = (html: string): string => {
-     let previous: string;
-     let current = html;
-     do {
-         previous = current;
-         current = current
-             .replace(/<script[\s\S]*?<\/script>/gi, '')
-             .replace(/<style[\s\S]*?<\/style>/gi, '')
-             .replace(/<[^>]+>/g, '');
-     } while (current !== previous);
-     return current.trim();
+export const sanitizeForRender = (html: string) => {
+  return sanitizeHtml(html, {
+    allowedTags: [
+      "p", "b", "i", "em", "strong",
+      "a", "img", "ul", "ol", "li",
+      "h1", "h2", "h3", "blockquote",
+      "div", "span", "br"
+    ],
+    allowedAttributes: {
+      a: ["href", "target"],
+      img: ["src", "alt"],
+      div: ["class"],
+      span: ["class"]
+    },
+    allowedSchemes: ["http", "https", "mailto"],
+  });
 };
 
 const decodeHtmlEntities = (text: string): string => {
@@ -50,6 +56,21 @@ const decodeHtmlEntities = (text: string): string => {
         .trim();
 };
 
+const stripHtml = (html: string): string => {
+    if (!html) return '';
+
+    // Remove script/style blocks first to avoid leftover tags or JS.
+    const withoutScripts = html
+        .replace(/<script[\s\S]*?<\/script>/gi, '')
+        .replace(/<style[\s\S]*?<\/style>/gi, '');
+
+    // Use sanitize-html to remove all tags and attributes.
+    const sanitized = sanitizeHtml(withoutScripts, { allowedTags: [], allowedAttributes: {} });
+
+    // Decode any HTML entities and collapse whitespace.
+    return decodeHtmlEntities(sanitized).replace(/\s+/g, ' ').trim();
+};
+
 const estimateReadTime = (text: string): number => {
     const words = text.split(/\s+/).filter(Boolean).length;
     return Math.max(1, Math.ceil(words / 200));
@@ -59,11 +80,11 @@ const categoryIconMap: Record<string, string> = {
   sleep: 'bedtime',
   wellness: 'spa',
   'womens-health': 'favorite',
-  fitness: 'fitness-center',      // 🔥 change here
+  fitness: 'fitness-center',
   lifestyle: 'home',
   'mental-health': 'psychology',
   nutrition: 'restaurant',
-  'self-care': 'self-improvement', // 🔥 change here
+  'self-care': 'self-improvement',
 };
 
 const getCategoryIcon = (slug: string) => categoryIconMap[slug.toLowerCase()] ?? 'label';
