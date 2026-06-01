@@ -3,6 +3,7 @@ import { Modal, View, Text, StyleSheet, TouchableOpacity, Pressable, Switch } fr
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Theme } from '../../theme/themes';
 import { useTheme } from '../../theme/ThemeContext';
+import { useStores } from '../../store/StoreProvider';
 
 interface SettingsModalProps {
     visible: boolean;
@@ -10,10 +11,14 @@ interface SettingsModalProps {
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
-    const { theme, toggleTheme, isDarkMode } = useTheme();
+    const { SettingsStore } = useStores();
+
+    const { theme } = useTheme();
     const styles = createStyles(theme);
 
     const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+
+    console.log(SettingsStore);
 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -48,8 +53,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }
                         </View>
 
                         <Switch
-                            value={isDarkMode}
-                            onValueChange={toggleTheme}
+                            value={SettingsStore.isDarkMode}
+                            onValueChange={SettingsStore.toggleTheme}
                             trackColor={{ false: theme.border, true: theme.accent }}
                             thumbColor={theme.surface}
                         />
@@ -70,7 +75,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }
     );
 };
 
-const createStyles = (theme: Theme) => 
+const createStyles = (theme: Theme) =>
     StyleSheet.create({
         backdrop: {
             flex: 1,
