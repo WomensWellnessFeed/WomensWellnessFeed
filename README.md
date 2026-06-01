@@ -1,1 +1,3 @@
 # WomensWellnessFeed
+
+npm start
