@@ -22,7 +22,7 @@ export const ProfileScreen: React.FC = () => {
                     }}
                     style={styles.avatar}
                 />
-                <Text style={styles.name}>{user?.name ?? ''}</Text>
+                <Text style={styles.name}>{user?.name || 'Wellness User'}</Text>
                 <Text style={styles.email}>{user?.email ?? ''}</Text>
             </View>
 

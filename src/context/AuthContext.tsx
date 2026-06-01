@@ -1,9 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const AUTH_KEY = 'auth_user';
+import { supabase } from '../lib/supabase';
 
 type AuthUser = {
+    id: string;
     name: string;
     email: string;
 };
@@ -12,8 +11,8 @@ type AuthContextType = {
     isLoggedIn: boolean;
     isLoading: boolean;
     user: AuthUser | null;
-    login: (email: string) => Promise<void>;
-    signUp: (name: string, email: string) => Promise<void>;
+    login: (email: string, password: string) => Promise<void>;
+    signUp: (name: string, email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
 };
 
@@ -26,49 +25,60 @@ const AuthContext = createContext<AuthContextType>({
     logout: async () => {},
 });
 
+const toAuthUser = (supabaseUser: any): AuthUser => ({
+    id: supabaseUser.id,
+    name: supabaseUser.user_metadata?.name ?? supabaseUser.user_metadata?.full_name ?? '',
+    email: supabaseUser.email,
+});
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [user, setUser] = useState<AuthUser | null>(null);
 
     useEffect(() => {
-        const check = async () => {
-            try {
-                const stored = await AsyncStorage.getItem(AUTH_KEY);
-                if (stored) {
-                    const parsed = JSON.parse(stored);
-                    if (parsed.isLoggedIn === true) {
-                        setIsLoggedIn(true);
-                        setUser(parsed.user ?? null);
-                    }
-                }
-            } catch {
-                // treat as new user
-            } finally {
-                setIsLoading(false);
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session?.user) {
+                setUser(toAuthUser(session.user));
+                setIsLoggedIn(true);
             }
-        };
-        check();
+            setIsLoading(false);
+        });
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            if (session?.user) {
+                setUser(toAuthUser(session.user));
+                setIsLoggedIn(true);
+            } else {
+                setUser(null);
+                setIsLoggedIn(false);
+            }
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
 
-    const signUp = async (name: string, email: string) => {
-        const authUser: AuthUser = { name, email };
-        await AsyncStorage.setItem(AUTH_KEY, JSON.stringify({ isLoggedIn: true, user: authUser }));
-        setUser(authUser);
-        setIsLoggedIn(true);
+    const signUp = async (name: string, email: string, password: string) => {
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { name } },
+        });
+        if (error) throw error;
+
+        if (data.user) {
+            await supabase.from('profiles').upsert({ id: data.user.id, email });
+        }
     };
 
-    const login = async (email: string) => {
-        const authUser: AuthUser = { name: email, email };
-        await AsyncStorage.setItem(AUTH_KEY, JSON.stringify({ isLoggedIn: true, user: authUser }));
-        setUser(authUser);
-        setIsLoggedIn(true);
+    const login = async (email: string, password: string) => {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
     };
 
     const logout = async () => {
-        await AsyncStorage.setItem(AUTH_KEY, JSON.stringify({ isLoggedIn: false }));
-        setUser(null);
-        setIsLoggedIn(false);
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
     };
 
     return (
