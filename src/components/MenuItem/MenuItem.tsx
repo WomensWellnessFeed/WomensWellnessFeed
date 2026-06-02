@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { MaterialIcons as Icon } from '@expo/vector-icons';
 import { useTheme } from '../../theme/ThemeContext';
 import { Theme } from '../../theme/themes';
 
@@ -16,12 +16,18 @@ export const MenuItem: React.FC<MenuItemProps> = ({ icon, title, onPress, isLast
     const styles = createStyles(theme);
 
     return (
-        <TouchableOpacity style={[styles.menuItem, isLast && styles.menuItemLast]} onPress={onPress}>
-            <View style={styles.menuItemLeft}>
-                <Icon name={icon} size={24} color={theme.primary} />
-                <Text style={styles.menuItemText}>{title}</Text>
+        <TouchableOpacity
+            style={[styles.menuItem, isLast && styles.menuItemLast]}
+            onPress={onPress}
+            activeOpacity={0.7}
+        >
+            <View style={styles.left}>
+                <View style={styles.iconWrap}>
+                    <Icon name={icon} size={20} color={theme.primary} />
+                </View>
+                <Text style={styles.label}>{title}</Text>
             </View>
-            <Icon name="chevron-right" size={24} color={theme.textSecondary} />
+            <Icon name="chevron-right" size={20} color={theme.border} />
         </TouchableOpacity>
     );
 };
@@ -32,20 +38,30 @@ const createStyles = (theme: Theme) =>
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
-            padding: 16,
+            paddingVertical: 15,
+            paddingHorizontal: 20,
             borderBottomWidth: 1,
             borderBottomColor: theme.border,
         },
         menuItemLast: {
             borderBottomWidth: 0,
         },
-        menuItemLeft: {
+        left: {
             flexDirection: 'row',
             alignItems: 'center',
+            gap: 14,
         },
-        menuItemText: {
-            fontSize: 16,
+        iconWrap: {
+            width: 36,
+            height: 36,
+            borderRadius: 10,
+            backgroundColor: theme.primary + '14',
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        label: {
+            fontSize: 15,
             color: theme.text,
-            marginLeft: 16,
+            fontWeight: '500',
         },
     });

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, ScrollView, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { MaterialIcons as Icon } from '@expo/vector-icons';
 import { Category } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { Theme } from '../theme/themes';
@@ -27,38 +27,35 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
             contentContainerStyle={styles.contentContainer}
         >
             <TouchableOpacity
-                style={[styles.categoryChip, !selectedCategory && styles.categoryChipActive]}
+                style={[styles.chip, !selectedCategory && styles.chipActive]}
                 onPress={() => onSelectCategory(null)}
+                activeOpacity={0.8}
             >
-                <Text style={[styles.categoryText, !selectedCategory && styles.categoryTextActive]}>
+                <Text style={[styles.chipText, !selectedCategory && styles.chipTextActive]}>
                     All
                 </Text>
             </TouchableOpacity>
-            {categories.map(category => (
-                <TouchableOpacity
-                    key={category.id}
-                    style={[
-                        styles.categoryChip,
-                        selectedCategory === category.id && styles.categoryChipActive,
-                    ]}
-                    onPress={() => onSelectCategory(category.id)}
-                >
-                    <Icon
-                        name={category.icon}
-                        size={16}
-                        color={selectedCategory === category.id ? theme.surface : theme.primary}
-                        style={styles.icon}
-                    />
-                    <Text
-                        style={[
-                            styles.categoryText,
-                            selectedCategory === category.id && styles.categoryTextActive,
-                        ]}
+            {categories.map(category => {
+                const isActive = selectedCategory === category.id;
+                return (
+                    <TouchableOpacity
+                        key={category.id}
+                        style={[styles.chip, isActive && styles.chipActive]}
+                        onPress={() => onSelectCategory(category.id)}
+                        activeOpacity={0.8}
                     >
-                        {category.name}
-                    </Text>
-                </TouchableOpacity>
-            ))}
+                        <Icon
+                            name={category.icon}
+                            size={14}
+                            color={isActive ? theme.surface : theme.textSecondary}
+                            style={styles.icon}
+                        />
+                        <Text style={[styles.chipText, isActive && styles.chipTextActive]}>
+                            {category.name}
+                        </Text>
+                    </TouchableOpacity>
+                );
+            })}
         </ScrollView>
     );
 };
@@ -66,46 +63,38 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
 const createStyles = (theme: Theme) =>
     StyleSheet.create({
         container: {
-            minHeight: 50,
-            maxHeight: 50,
-            alignSelf: Platform.select({
-                web: 'center',
-                default: 'auto',
-             }),
-            width: Platform.select({
-                web: '80%',
-                default: '100%',
-            }),
-            marginBottom: 10,
+            minHeight: 52,
+            maxHeight: 52,
+            alignSelf: Platform.select({ web: 'center', default: 'auto' }),
+            width: Platform.select({ web: '80%', default: '100%' }),
         },
         contentContainer: {
             paddingHorizontal: 16,
-            paddingVertical: 8,
+            paddingVertical: 10,
+            gap: 8,
         },
-        categoryChip: {
+        chip: {
             flexDirection: 'row',
             alignItems: 'center',
-            paddingHorizontal: 16,
-            paddingVertical: 8,
-            borderRadius: 20,
+            paddingHorizontal: 14,
+            paddingVertical: 6,
+            borderRadius: 999,
             backgroundColor: theme.surface,
-            borderWidth: 1,
-            borderColor: theme.primary,
-            marginRight: 8,
         },
-        categoryChipActive: {
+        chipActive: {
             backgroundColor: theme.primary,
-            borderColor: theme.primary,
         },
-        categoryText: {
-            fontSize: 14,
-            color: theme.primary,
+        chipText: {
+            fontSize: 13,
+            color: theme.textSecondary,
+            fontWeight: '500',
+            letterSpacing: 0.1,
+        },
+        chipTextActive: {
+            color: theme.surface,
             fontWeight: '600',
         },
-        categoryTextActive: {
-            color: theme.surface,
-        },
         icon: {
-            marginRight: 4,
+            marginRight: 5,
         },
     });
