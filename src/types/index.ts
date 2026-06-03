@@ -2,13 +2,16 @@ export interface Article {
     id: number;
     title: string;
     excerpt: string;
-    author: string;
-    category: string;
+    content?: string;
     publishedAt: string;
+    link: string;
+    category?: string;
+    categoryId?: number;
+    author?: string;
     imageUrl?: string;
-    readTime: number;
-    likes: number;
-    isBookmarked: boolean;
+    readTime?: number;
+    likes?: number;
+    isBookmarked?: boolean;
 }
 
 export interface Category {
