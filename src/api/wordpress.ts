@@ -7,6 +7,21 @@ export interface WordPressCategory {
     slug: string;
 }
 
+export interface WordPressAPIPost {
+    id: number;
+    date: string;
+    link: string;
+    title: { rendered: string };
+    excerpt: { rendered: string };
+    content: { rendered: string };
+    jetpack_featured_media_url?: string;
+    _embedded?: {
+        'wp:term'?: Array<Array<{ id: number; name: string; slug: string }>>;
+        'wp:featuredmedia'?: Array<{ source_url: string }>;
+        author?: Array<{ name: string }>;
+    };
+}
+
 export interface WordPressPost {
     id: number;
     title: string;
@@ -117,7 +132,7 @@ export const fetchPosts = async (page = 1, perPage = 10): Promise<WordPressPost[
         throw new Error('Unexpected response format from WordPress API');
     }
 
-    return data.map((post: any) => {
+    return data.map((post: WordPressAPIPost) => {
         const embeddedCategory = post._embedded?.['wp:term']?.[0]?.[0];
         const featuredMedia = post._embedded?.['wp:featuredmedia']?.[0];
         const imageUrl =
