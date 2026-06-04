@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -9,7 +9,10 @@ import { SearchScreen } from '../screens/SearchScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
 import { ChatScreen } from '../screens/ChatScreen';
 import { DiscoveryScreen } from '../screens/DiscoveryScreen';
+import { SignUpScreen } from '../screens/SignUpScreen';
+import { LoginScreen } from '../screens/LoginScreen';
 import { useTheme } from '../theme/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
@@ -47,7 +50,7 @@ const renderTabBarIcon = (name: string) => ({ color, size }: { color: string; si
     <Icon name={name} size={size} color={color} />
 );
 
-export const AppNavigator: React.FC = () => {
+const MainTabs: React.FC = () => {
     const { theme } = useTheme();
     const navigationTheme = {
         ...DefaultTheme,
@@ -115,4 +118,24 @@ export const AppNavigator: React.FC = () => {
             </Tab.Navigator>
         </NavigationContainer>
     );
+};
+
+export const AppNavigator: React.FC = () => {
+    const { isLoggedIn, isLoading } = useAuth();
+    const [showLogin, setShowLogin] = useState(false);
+
+    useEffect(() => {
+        if (!isLoggedIn) setShowLogin(false);
+    }, [isLoggedIn]);
+
+    if (isLoading) return null;
+
+    if (!isLoggedIn) {
+        if (showLogin) {
+            return <LoginScreen onNavigateToSignUp={() => setShowLogin(false)} />;
+        }
+        return <SignUpScreen onNavigateToLogin={() => setShowLogin(true)} />;
+    }
+
+    return <MainTabs />;
 };

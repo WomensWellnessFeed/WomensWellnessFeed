@@ -4,9 +4,11 @@ import { MenuItem } from '../components/MenuItem/MenuItem';
 import { useTheme } from '../theme/ThemeContext';
 import { Theme } from '../theme/themes';
 import { SettingsModal } from './SettingsModal/SettingsModal';
+import { useAuth } from '../context/AuthContext';
 
 export const ProfileScreen: React.FC = () => {
     const { theme, toggleTheme, isDarkMode } = useTheme();
+    const { user, logout } = useAuth();
     const styles = createStyles(theme);
 
     const [showSettingsModal, setShowSettingsModal] = React.useState(false);
@@ -20,8 +22,8 @@ export const ProfileScreen: React.FC = () => {
                     }}
                     style={styles.avatar}
                 />
-                <Text style={styles.name}>Jane Doe</Text>
-                <Text style={styles.email}>jane.doe@example.com</Text>
+                <Text style={styles.name}>{user?.name ?? ''}</Text>
+                <Text style={styles.email}>{user?.email ?? ''}</Text>
             </View>
 
             <View style={styles.section}>
@@ -34,7 +36,7 @@ export const ProfileScreen: React.FC = () => {
                     onPress={() => setShowSettingsModal(true)}
                 />
                 <MenuItem icon="help" title="Help & Support" onPress={() => {}} />
-                <MenuItem icon="logout" title="Logout" onPress={() => {}} isLast />
+                <MenuItem icon="logout" title="Logout" onPress={logout} isLast />
             </View>
 
             <SettingsModal
