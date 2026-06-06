@@ -27,12 +27,19 @@ export const SignUpScreen: React.FC<Props> = ({ onNavigateToLogin }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
 
     const handleSignUp = async () => {
         if (!name.trim() || !email.trim() || !password.trim()) return;
         setIsSubmitting(true);
-        await signUp(name.trim(), email.trim());
-        setIsSubmitting(false);
+        setError('');
+        try {
+            await signUp(name.trim(), email.trim(), password);
+        } catch (e: any) {
+            setError(e.message ?? 'Sign up failed');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -81,6 +88,7 @@ export const SignUpScreen: React.FC<Props> = ({ onNavigateToLogin }) => {
                         autoComplete="new-password"
                     />
 
+                    {error ? <Text style={styles.error}>{error}</Text> : null}
                     <TouchableOpacity
                         style={[styles.button, isSubmitting && styles.buttonDisabled]}
                         onPress={handleSignUp}
@@ -187,5 +195,10 @@ const createStyles = (theme: Theme) =>
         loginLinkBold: {
             color: theme.primary,
             fontWeight: '600',
+        },
+        error: {
+            color: '#ef4444',
+            fontSize: 13,
+            marginBottom: 10,
         },
     });
