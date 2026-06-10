@@ -1,0 +1,266 @@
+Setting Up Supabase API Exports
+Here's how to structure your Supabase API exports for handling user settings and article bookmarks:
+1. Database Schema Setup
+First, ensure you have the appropriate tables in Supabase:
+
+
+
+-- User settings table
+CREATE TABLE user_settings (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  theme VARCHAR(20) DEFAULT 'light',
+  notifications_enabled BOOLEAN DEFAULT true,
+  email_frequency VARCHAR(20) DEFAULT 'daily',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id)
+);
+
+-- Article bookmarks table
+CREATE TABLE article_bookmarks (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  article_id VARCHAR(255) NOT NULL,
+  article_title TEXT,
+  article_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, article_id)
+);
+
+-- Enable Row Level Security
+ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE article_bookmarks ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for user_settings
+CREATE POLICY "Users can view their own settings"
+  ON user_settings FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own settings"
+  ON user_settings FOR UPDATE
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own settings"
+  ON user_settings FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+-- RLS Policies for article_bookmarks
+CREATE POLICY "Users can view their own bookmarks"
+  ON article_bookmarks FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own bookmarks"
+  ON article_bookmarks FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own bookmarks"
+  ON article_bookmarks FOR DELETE
+  USING (auth.uid() = user_id);
+
+2. API Export Structure
+Create a file structure like this in your project:
+lib/supabase/api/userSettings.js (or .ts for TypeScript):
+
+
+
+import { supabase } from '../client';
+
+export const userSettingsAPI = {
+  // Get user settings
+  async getSettings(userId) {
+    const { data, error } = await supabase
+      .from('user_settings')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+      throw error;
+    }
+    
+    return data;
+  },
+
+  // Update user settings (upsert pattern)
+  async updateSettings(userId, settings) {
+    const { data, error } = await supabase
+      .from('user_settings')
+      .upsert(
+        { 
+          user_id: userId, 
+          ...settings,
+          updated_at: new Date().toISOString()
+        },
+        { onConflict: 'user_id' }
+      )
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // Update specific setting field
+  async updateSetting(userId, field, value) {
+    const { data, error } = await supabase
+      .from('user_settings')
+      .update({ 
+        [field]: value,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+};
+
+lib/supabase/api/bookmarks.js:
+
+
+
+import { supabase } from '../client';
+
+export const bookmarksAPI = {
+  // Get all bookmarks for a user
+  async getBookmarks(userId) {
+    const { data, error } = await supabase
+      .from('article_bookmarks')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // Add a bookmark
+  async addBookmark(userId, article) {
+    const { data, error } = await supabase
+      .from('article_bookmarks')
+      .insert({
+        user_id: userId,
+        article_id: article.id,
+        article_title: article.title,
+        article_url: article.url
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      // Handle duplicate bookmark gracefully
+      if (error.code === '23505') {
+        throw new Error('Article already bookmarked');
+      }
+      throw error;
+    }
+    return data;
+  },
+
+  // Remove a bookmark
+  async removeBookmark(userId, articleId) {
+    const { error } = await supabase
+      .from('article_bookmarks')
+      .delete()
+      .eq('user_id', userId)
+      .eq('article_id', articleId);
+    
+    if (error) throw error;
+    return true;
+  },
+
+  // Check if article is bookmarked
+  async isBookmarked(userId, articleId) {
+    const { data, error } = await supabase
+      .from('article_bookmarks')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('article_id', articleId)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') {
+      throw error;
+    }
+    
+    return !!data;
+  },
+
+  // Toggle bookmark
+  async toggleBookmark(userId, article) {
+    const isBookmarked = await this.isBookmarked(userId, article.id);
+    
+    if (isBookmarked) {
+      await this.removeBookmark(userId, article.id);
+      return { bookmarked: false };
+    } else {
+      await this.addBookmark(userId, article);
+      return { bookmarked: true };
+    }
+  }
+};
+
+3. Main API Export File
+lib/supabase/api/index.js:
+
+
+
+export { userSettingsAPI } from './userSettings';
+export { bookmarksAPI } from './bookmarks';
+
+// Or as a combined export
+import { userSettingsAPI } from './userSettings';
+import { bookmarksAPI } from './bookmarks';
+
+export const supabaseAPI = {
+  userSettings: userSettingsAPI,
+  bookmarks: bookmarksAPI
+};
+
+4. Usage Example
+In your React components or pages:
+
+
+
+import { supabaseAPI } from '@/lib/supabase/api';
+import { useAuth } from '@/contexts/AuthContext'; // or however you manage auth
+
+function SettingsPage() {
+  const { user } = useAuth();
+
+  const handleUpdateTheme = async (theme) => {
+    try {
+      await supabaseAPI.userSettings.updateSetting(user.id, 'theme', theme);
+      // Update local state or show success message
+    } catch (error) {
+      console.error('Failed to update theme:', error);
+    }
+  };
+
+  const handleToggleBookmark = async (article) => {
+    try {
+      const result = await supabaseAPI.bookmarks.toggleBookmark(user.id, article);
+      // Update UI based on result.bookmarked
+    } catch (error) {
+      console.error('Failed to toggle bookmark:', error);
+    }
+  };
+
+  return (
+    // Your component JSX
+  );
+}
+
+5. Supabase Client Setup
+Make sure you have your Supabase client configured (lib/supabase/client.js):
+
+
+
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
