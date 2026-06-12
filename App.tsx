@@ -2,6 +2,7 @@ import React from 'react';
 import { StatusBar } from 'react-native';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
+import { AuthProvider } from './src/context/AuthContext';
 
 const AppContent: React.FC = () => {
     const { theme } = useTheme();
@@ -16,7 +17,9 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => (
     <ThemeProvider>
-        <AppContent />
+        <AuthProvider>
+            <AppContent />
+        </AuthProvider>
     </ThemeProvider>
 );
 
