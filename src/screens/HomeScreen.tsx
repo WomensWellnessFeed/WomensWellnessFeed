@@ -119,19 +119,23 @@ export const HomeScreen: React.FC = () => {
         );
     };
 
-    const handleBookmark = (id: number) => {
-        articleService(id.toString());
-        
-        setArticles(prev =>
-            prev.map(article =>
-                article.id === id
-                    ? {
-                          ...article,
-                          isBookmarked: !article.isBookmarked,
-                      }
-                    : article
-            )
-        );
+    const handleBookmark = async (id: number) => {
+        try {
+            const isBookmarked = await articleService(id.toString());
+
+            setArticles(prev =>
+                prev.map(article =>
+                    article.id === id
+                        ? {
+                              ...article,
+                              isBookmarked: isBookmarked,
+                          }
+                        : article
+                )
+            );
+        } catch (error) {
+            console.error(`Error bookmarking article: ${error}`);
+        }
     };
 
     const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -186,12 +190,18 @@ export const HomeScreen: React.FC = () => {
                 }
                 ListFooterComponent={
                     isLoadingMore ? (
-                        <ActivityIndicator size="small" color={theme.primary} style={styles.footerLoader} />
+                        <ActivityIndicator
+                            size="small"
+                            color={theme.primary}
+                            style={styles.footerLoader}
+                        />
                     ) : null
                 }
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
-                        <Text style={styles.emptyText}>{error ? 'Unable to load posts.' : 'No articles found'}</Text>
+                        <Text style={styles.emptyText}>
+                            {error ? 'Unable to load posts.' : 'No articles found'}
+                        </Text>
                     </View>
                 }
             />

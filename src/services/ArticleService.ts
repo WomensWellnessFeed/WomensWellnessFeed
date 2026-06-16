@@ -1,20 +1,6 @@
 import { supabase } from '../lib/supabase';
 
-export interface article {
-    id: string;
-    title: string;
-    content: string;
-    author: string;
-    published_at: string;
-}
-
-export interface savedArticle {
-    id: string;
-    article_id: string;
-    user_id: string;
-}
-
-export const articleService = async (articleId: string) => {
+export const articleService = async (articleId: string): Promise<boolean> => {
     const {
         data: { user },
         error: authError,
@@ -23,28 +9,6 @@ export const articleService = async (articleId: string) => {
     if (authError) {
         throw new Error(`Error fetching user: ${authError.message}`);
     }
-
-    const saveArticle = async () => {
-        const { data, error } = await supabase
-            .from('saved_articles')
-            .insert([{ article_id: articleId, user_id: user?.id }]);
-
-        if (error) {
-            throw new Error(`Error bookmarking article: ${error.message}`);
-        }
-    };
-
-    const removeSavedArticle = async () => {
-        const { error } = await supabase
-            .from('saved_articles')
-            .delete()
-            .eq('article_id', articleId)
-            .eq('user_id', user?.id);
-
-        if (error) {
-            throw new Error(`Error removing saved article: ${error.message}`);
-        }
-    };
 
     // fetch saved articles with the given articleId and userId to see if it's already saved
     const { data: saved_articles, error: err } = await supabase
@@ -58,8 +22,28 @@ export const articleService = async (articleId: string) => {
     }
 
     if (saved_articles.length > 0) {
-        await removeSavedArticle();
+        const { error } = await supabase
+            .from('saved_articles')
+            .delete()
+            .eq('article_id', articleId)
+            .eq('user_id', user?.id);
+
+        if (error) {
+            throw new Error(`Error removing saved article: ${error.message}`);
+        }
+
+        return false;
     } else {
-        await saveArticle();
+        const { data, error } = await supabase
+            .from('saved_articles')
+            .insert([{ article_id: articleId, user_id: user?.id }]);
+
+        if (error) {
+            throw new Error(`Error bookmarking article: ${error.message}`);
+        }
+
+        return true;
     }
+
+    return false;
 };
