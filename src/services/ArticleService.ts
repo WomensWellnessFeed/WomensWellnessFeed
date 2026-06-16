@@ -14,11 +14,20 @@ export interface savedArticle {
     user_id: string;
 }
 
-export const articleService = async (articleId: string, userId: string) => {
+export const articleService = async (articleId: string) => {
+    const {
+        data: { user },
+        error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+        throw new Error(`Error fetching user: ${authError.message}`);
+    }
+
     const saveArticle = async () => {
         const { data, error } = await supabase
             .from('saved_articles')
-            .insert({ article_id: articleId, user_id: userId });
+            .insert([{ article_id: articleId, user_id: user?.id }]);
 
         if (error) {
             throw new Error(`Error bookmarking article: ${error.message}`);
@@ -30,7 +39,7 @@ export const articleService = async (articleId: string, userId: string) => {
             .from('saved_articles')
             .delete()
             .eq('article_id', articleId)
-            .eq('user_id', userId);
+            .eq('user_id', user?.id);
 
         if (error) {
             throw new Error(`Error removing saved article: ${error.message}`);
@@ -38,17 +47,17 @@ export const articleService = async (articleId: string, userId: string) => {
     };
 
     // fetch saved articles with the given articleId and userId to see if it's already saved
-    const { data: savedArticles, error: err } = await supabase
+    const { data: saved_articles, error: err } = await supabase
         .from('saved_articles')
         .select('*')
         .eq('article_id', articleId)
-        .eq('user_id', userId);
+        .eq('user_id', user?.id);
 
     if (err) {
         throw new Error(`Error fetching saved articles: ${err.message}`);
     }
 
-    if (savedArticles.length > 0) {
+    if (saved_articles.length > 0) {
         await removeSavedArticle();
     } else {
         await saveArticle();

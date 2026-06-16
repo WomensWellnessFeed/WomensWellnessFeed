@@ -8,6 +8,7 @@ import { Article, Category } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { Theme } from '../theme/themes';
 import { fetchPosts, fetchCategories, mapWordPressCategoryToIcon } from '../api/wordpress';
+import { articleService } from '../services/ArticleService';
 
 type HomeStackParamList = {
     HomeMain: undefined;
@@ -119,6 +120,8 @@ export const HomeScreen: React.FC = () => {
     };
 
     const handleBookmark = (id: number) => {
+        articleService(id.toString());
+        
         setArticles(prev =>
             prev.map(article =>
                 article.id === id
