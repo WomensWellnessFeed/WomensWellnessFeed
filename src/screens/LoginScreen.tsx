@@ -94,7 +94,7 @@ export const LoginScreen: React.FC<Props> = ({ onNavigateToSignUp }) => {
 
                     <TouchableOpacity onPress={onNavigateToSignUp} style={styles.signUpLink}>
                         <Text style={styles.signUpLinkText}>
-                            Don&apos;t have an account?{' '}
+                            Don't have an account?{' '}
                             <Text style={styles.signUpLinkBold}>Sign up</Text>
                         </Text>
                     </TouchableOpacity>
