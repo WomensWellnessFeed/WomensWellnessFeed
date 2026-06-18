@@ -7,7 +7,11 @@ import { CategoryFilter } from '../components/CategoryFilter';
 import { Article, Category } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { Theme } from '../theme/themes';
-import { fetchPosts, fetchCategories, mapWordPressCategoryToIcon } from '../api/wordpress';
+import {
+    fetchArticlesWithBookmarks,
+    fetchHomeCategories,
+    toggleArticleBookmark,
+} from '../services/ArticleService';
 
 type HomeStackParamList = {
     HomeMain: undefined;
@@ -31,30 +35,26 @@ export const HomeScreen: React.FC = () => {
     const [hasMore, setHasMore] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const navigation = useNavigation<HomeScreenNavigationProp>();
+
     useEffect(() => {
-        loadResources();
+        loadInitialData();
     }, []);
 
-    const loadResources = async () => {
+    const loadInitialData = async () => {
         setIsLoading(true);
         setError(null);
 
         try {
-            const [posts, categoryData] = await Promise.all([
-                fetchPosts(1, POSTS_PER_PAGE),
-                fetchCategories(),
+            const [articlesWithBookmarks, categoryList] = await Promise.all([
+                fetchArticlesWithBookmarks(1, POSTS_PER_PAGE),
+                fetchHomeCategories(),
             ]);
 
-            setArticles(posts);
-            setCategories(
-                categoryData.map(category => ({
-                    id: category.id,
-                    name: category.name,
-                    icon: mapWordPressCategoryToIcon(category.slug),
-                }))
-            );
+            setArticles(articlesWithBookmarks);
+            setCategories(categoryList);
             setPage(1);
-            setHasMore(posts.length === POSTS_PER_PAGE);
+            setHasMore(articlesWithBookmarks.length === POSTS_PER_PAGE);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Unable to load articles.');
         } finally {
@@ -75,15 +75,23 @@ export const HomeScreen: React.FC = () => {
         setError(null);
 
         try {
-            const posts = await fetchPosts(pageToLoad, POSTS_PER_PAGE);
+            const articlesWithBookmarks = await fetchArticlesWithBookmarks(
+                pageToLoad,
+                POSTS_PER_PAGE
+            );
 
             setArticles(prev =>
                 pageToLoad === 1
-                    ? posts
-                    : [...prev, ...posts.filter(post => !prev.some(item => item.id === post.id))]
+                    ? articlesWithBookmarks
+                    : [
+                          ...prev,
+                          ...articlesWithBookmarks.filter(
+                              post => !prev.some(item => item.id === post.id)
+                          ),
+                      ]
             );
             setPage(pageToLoad);
-            setHasMore(posts.length === POSTS_PER_PAGE);
+            setHasMore(articlesWithBookmarks.length === POSTS_PER_PAGE);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Unable to load articles.');
         } finally {
@@ -101,37 +109,20 @@ export const HomeScreen: React.FC = () => {
         if (isLoading || isRefreshing || isLoadingMore || !hasMore) {
             return;
         }
-
         await loadArticles(page + 1);
     };
 
-    const handleLike = (id: number) => {
-        setArticles(prev =>
-            prev.map(article =>
-                article.id === id
-                    ? {
-                          ...article,
-                          likes: (article.likes ?? 0) + 1,
-                      }
-                    : article
-            )
-        );
-    };
+    const handleBookmark = async (id: number) => {
+        try {
+            const isBookmarked = await toggleArticleBookmark(id.toString());
 
-    const handleBookmark = (id: number) => {
-        setArticles(prev =>
-            prev.map(article =>
-                article.id === id
-                    ? {
-                          ...article,
-                          isBookmarked: !article.isBookmarked,
-                      }
-                    : article
-            )
-        );
+            setArticles(prev =>
+                prev.map(article => (article.id === id ? { ...article, isBookmarked } : article))
+            );
+        } catch (error) {
+            console.error(`Error bookmarking article: ${error}`);
+        }
     };
-
-    const navigation = useNavigation<HomeScreenNavigationProp>();
 
     const openArticle = (article: Article) => {
         navigation.navigate('ArticleDetail', { article });
@@ -168,7 +159,6 @@ export const HomeScreen: React.FC = () => {
                     <FeedCard
                         article={item}
                         onPress={() => openArticle(item)}
-                        onLike={() => handleLike(item.id)}
                         onBookmark={() => handleBookmark(item.id)}
                     />
                 )}
@@ -183,12 +173,18 @@ export const HomeScreen: React.FC = () => {
                 }
                 ListFooterComponent={
                     isLoadingMore ? (
-                        <ActivityIndicator size="small" color={theme.primary} style={styles.footerLoader} />
+                        <ActivityIndicator
+                            size="small"
+                            color={theme.primary}
+                            style={styles.footerLoader}
+                        />
                     ) : null
                 }
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
-                        <Text style={styles.emptyText}>{error ? 'Unable to load posts.' : 'No articles found'}</Text>
+                        <Text style={styles.emptyText}>
+                            {error ? 'Unable to load posts.' : 'No articles found'}
+                        </Text>
                     </View>
                 }
             />

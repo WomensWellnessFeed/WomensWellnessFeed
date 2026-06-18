@@ -8,11 +8,10 @@ import { Theme } from '../theme/themes';
 interface FeedCardProps {
     article: Article;
     onPress: () => void;
-    onLike: () => void;
     onBookmark: () => void;
 }
 
-export const FeedCard: React.FC<FeedCardProps> = ({ article, onPress, onLike, onBookmark }) => {
+export const FeedCard: React.FC<FeedCardProps> = ({ article, onPress, onBookmark }) => {
     const { theme } = useTheme();
     const styles = createStyles(theme);
     const publishedDate = article.publishedAt
@@ -47,10 +46,6 @@ export const FeedCard: React.FC<FeedCardProps> = ({ article, onPress, onLike, on
                         ) : null}
                     </View>
                     <View style={styles.actions}>
-                        <TouchableOpacity style={styles.actionButton} onPress={onLike}>
-                            <Icon name="favorite-border" size={20} color={theme.primary} />
-                            <Text style={styles.actionText}>{article.likes ?? 0}</Text>
-                        </TouchableOpacity>
                         <TouchableOpacity style={styles.actionButton} onPress={onBookmark}>
                             <Icon
                                 name={article.isBookmarked ? 'bookmark' : 'bookmark-border'}
