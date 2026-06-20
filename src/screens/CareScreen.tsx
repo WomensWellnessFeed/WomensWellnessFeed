@@ -1,20 +1,8 @@
 import React from 'react';
-import {
-    View,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-} from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '../theme/ThemeContext';
 import { Theme } from '../theme/themes';
-
-const SYMPTOMS = [
-    { id: '1', label: 'Menstrual Cycle', value: 'Currently on day 12', icon: 'favorite', color: '#E91E63' },
-    { id: '2', label: 'Mood Tracking', value: 'Currently feeling good', icon: 'sentiment-satisfied', color: '#9C27B0' },
-    { id: '3', label: 'Energy Levels', value: 'Currently moderate', icon: 'bolt', color: '#FF9800' },
-];
 
 const NOTES = [
     {
@@ -35,8 +23,42 @@ export const CareScreen: React.FC = () => {
     const { theme } = useTheme();
     const styles = createStyles(theme);
 
+    const SYMPTOMS = [
+        {
+            id: '1',
+            label: 'Menstrual Cycle',
+            value: 'Currently on day 12',
+            icon: 'favorite',
+            color: theme.trackingCycle,
+            progress: 12,
+            maxProgress: 28,
+        },
+        {
+            id: '2',
+            label: 'Mood Tracking',
+            value: 'Currently feeling good',
+            icon: 'sentiment-satisfied',
+            color: theme.trackingMood,
+            progress: 75,
+            maxProgress: 100,
+        },
+        {
+            id: '3',
+            label: 'Energy Levels',
+            value: 'Currently moderate',
+            icon: 'bolt',
+            color: theme.trackingEnergy,
+            progress: 50,
+            maxProgress: 100,
+        },
+    ];
+
     return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView
+            style={styles.container}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+        >
             {/* Header */}
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Welcome to your care</Text>
@@ -55,12 +77,25 @@ export const CareScreen: React.FC = () => {
                 </View>
                 {SYMPTOMS.map(item => (
                     <View key={item.id} style={styles.metricCard}>
-                        <View style={[styles.metricIconWrap, { backgroundColor: item.color + '20' }]}>
+                        <View
+                            style={[styles.metricIconWrap, { backgroundColor: item.color + '20' }]}
+                        >
                             <Icon name={item.icon} size={22} color={item.color} />
                         </View>
                         <View style={styles.metricText}>
                             <Text style={styles.metricLabel}>{item.label}</Text>
                             <Text style={styles.metricValue}>{item.value}</Text>
+                            <View style={styles.progressTrack}>
+                                <View
+                                    style={[
+                                        styles.progressFill,
+                                        {
+                                            width: `${(item.progress / item.maxProgress) * 100}%` as any,
+                                            backgroundColor: item.color,
+                                        },
+                                    ]}
+                                />
+                            </View>
                         </View>
                         <Icon name="chevron-right" size={20} color={theme.textSecondary} />
                     </View>
@@ -91,8 +126,8 @@ export const CareScreen: React.FC = () => {
             {/* Quick Actions */}
             <View style={styles.actions}>
                 <TouchableOpacity style={[styles.actionBtn, styles.actionBtnPrimary]}>
-                    <Icon name="add-circle-outline" size={18} color="#FFFFFF" />
-                    <Text style={styles.actionBtnPrimaryText}>Add symptom</Text>
+                    <Icon name="add-circle-outline" size={18} color={theme.primary} />
+                    <Text style={styles.actionBtnText}>Add symptom</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.actionBtn, styles.actionBtnSecondary]}>
                     <Icon name="note-add" size={18} color={theme.primary} />
@@ -179,6 +214,22 @@ const createStyles = (theme: Theme) =>
             fontSize: 15,
             fontWeight: '600',
             color: theme.text,
+            marginBottom: 8,
+        },
+        progressTrack: {
+            height: 6,
+            backgroundColor: theme.border,
+            borderRadius: 3,
+            overflow: 'hidden',
+            marginBottom: 4,
+        },
+        progressFill: {
+            height: 6,
+            borderRadius: 3,
+        },
+        progressLabel: {
+            fontSize: 11,
+            fontWeight: '500',
         },
         noteCard: {
             flexDirection: 'row',
@@ -238,7 +289,7 @@ const createStyles = (theme: Theme) =>
             borderColor: theme.primary,
         },
         actionBtnPrimaryText: {
-            color: '#FFFFFF',
+            color: theme.primary,
             fontWeight: '600',
             fontSize: 15,
         },

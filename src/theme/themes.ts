@@ -9,6 +9,9 @@ export type Theme = {
     accent: string;
     success: string;
     error: string;
+    trackingCycle: string;
+    trackingMood: string;
+    trackingEnergy: string;
     statusBarStyle: 'light-content' | 'dark-content';
 };
 
@@ -23,6 +26,9 @@ export const lightTheme: Theme = {
     accent: '#FF4081',
     success: '#4CAF50',
     error: '#F44336',
+    trackingCycle: '#E91E63',
+    trackingMood: '#9C27B0',
+    trackingEnergy: '#FF9800',
     statusBarStyle: 'dark-content',
 };
 
@@ -37,5 +43,8 @@ export const darkTheme: Theme = {
     accent: '#FF79B0',
     success: '#4CAF50',
     error: '#CF6679',
+    trackingCycle: '#F06292',
+    trackingMood: '#BA68C8',
+    trackingEnergy: '#FFB74D',
     statusBarStyle: 'light-content',
 };
