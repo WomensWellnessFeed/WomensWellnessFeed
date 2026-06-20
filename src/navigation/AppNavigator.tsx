@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { HomeScreen } from '../screens/HomeScreen';
 import { ArticleDetailScreen } from '../screens/ArticleDetailScreen';
-import { SearchScreen } from '../screens/SearchScreen';
+import { CareScreen } from '../screens/CareScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
 import { ChatScreen } from '../screens/ChatScreen';
 import { DiscoveryScreen } from '../screens/DiscoveryScreen';
@@ -103,7 +103,7 @@ const MainTabs: React.FC = () => {
                 />
                 <Tab.Screen
                     name="Care"
-                    component={SearchScreen}
+                    component={CareScreen}
                     options={{
                         tabBarIcon: renderTabBarIcon('person'),
                     }}
